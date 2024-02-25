@@ -1,0 +1,125 @@
+-->SQL 
+
+--Create an ‘Orders’ and ‘customer’ table,insert above value in it.
+
+ Create table Customer (
+ Customer_numb int primary key, First_name varchar(50) not null,
+ Last_name varchar(50));
+
+ insert into Customer(Customer_numb, First_name, Last_name)
+ Values (001,'Jane','Doe'),
+ (002,'John', 'Doe'),
+ (003, 'Jane', 'Smith'),
+ (004, 'John', 'Smith'),
+ (005, 'Jane', 'Jones'),
+ (006, 'John', 'Jones');
+
+ select * from Customer;
+
+ create table Orders(order_numb int primary key, Customer_numb int foreign key (Customer_numb)
+ references Customer(Customer_numb),
+ Order_date Date,
+ Order_total decimal(10,2));
+
+ insert into Orders(Order_numb, customer_numb, Order_date, Order_total)
+ Values (1001, 001, '2009-10-10', 250.85),
+ (1002, 002, '2010-02-21', 225.89),
+ (1003, 003, '2009-11-22', 180.92),
+ (1004, 004, '2009-11-22', 565.92),
+ (1005, 005, '2009-12-15', 25.00),
+ (1006, 006, '2009-11-22', 109.12);
+
+ select*from Orders;
+
+  --2.Make an inner join on ‘Customer’ & ‘Order’ tables on the ‘customer_id’ column
+Select * from Customer inner join Orders on Customer.Customer_numb = Orders.Customer_numb;
+
+ --3.Make left and right joins on ‘Customer’ & ‘Order’ tables on the ‘customer_id’ column
+ Select * from Customer as C left join Orders as o on c.customer_numb =o.customer_numb;
+ Select * from Orders o right join Customer as C on o. customer_numb= C. Customer_numb;
+
+ --4.Update the ‘Orders’ table, set the amount to be 100 where ‘customer_id’ is 3.
+ Update orders set Order_total=100 Where Customer_numb=3;
+ Select * From Orders;
+
+--5.Alter the 'Customer' table to add a new column 'Email' of type VARCHAR(50). Update at least two customer records with their email addresses.
+ Alter table Customer
+ add Email varchar(50);
+ select*from customer;
+UPDATE customer SET email = 'janedoe@gmail.com' WHERE Customer_numb = 1;
+UPDATE customer SET Email = 'johnsmith@gmail.com' WHERE Customer_numb = 2;
+select*from customer;
+
+ --6. Perform a self-join on the 'Customer' table based on the 'city' column, retrieving customers from the same city.
+ Select * from Customer as C join customer as o on C. Customer_numb= o. Customer_numb;
+ 
+ --7. Delete all records from the 'Orders' table for customers whose 'customer_id' is not present in the 'Customers' table.
+ Delete from Orders where Customer_numb not in (select customer_numb from customer);
+ select*from customer;
+
+ --8. Create a new column 'order_status' in the 'Orders' table with default value 'Pending'.
+ Alter table Orders add order_status varchar(50) default ('Pending') ;
+ select*from Orders;
+ 
+ --9. Update the 'Customer' table to set the 'country' column to 'Unknown' for customers with no specified country.
+ UPDATE customer
+SET country = 'Unknown'
+WHERE country IS NULL OR country = '';
+select*from customer;
+
+ --10. Find the average order amount from the 'Orders' table.
+  Select Avg(order_total) from orders;
+
+ --11. Explain the significance of foreign keys in the context of the 'customer_id' column in the 'Orders' table.
+ ALTER TABLE orders
+ADD CONSTRAINT fk_orders_customer
+FOREIGN KEY (customer_numb)
+REFERENCES customer(customer_numb);
+select * from orders_3;
+
+ --12. How would you retrieve the names of customers who have not placed any orders?
+ select customer.first_name,customer.last_name from customer
+left join orders on customer.customer_numb = orders.customer_numb
+where orders.customer_numb is null;
+
+ --13. Write an SQL query to count the number of distinct cities in the 'Customers' table.
+ select count(distinct last_name) as numboflast_name from customer;
+
+
+ --14. Explain the purpose of the DELETE statement in SQL and provide an example from the given tasks.
+ --The delete statement is used to delete the row in a table. 
+delete from orders where order_numb=1004;
+select * from orders;
+
+ --15. What considerations would you take into account when adding a new column to an existing table in a production database?
+ --Ans:After table is used for adding a new column into an existing table.
+ 
+ --16. If you wanted to find the customer who spent the most on orders, how would you structure your SQL query?
+  Select max(customer_numb) from Orders;
+
+ --17. Describe scenarios where using a default value for a column like ‘’Order_status” in the ‘’orders’ table would be beneficial.
+ --Ans : By describing an default value of order status (Pending) shows the status of the customer who order is still pending .If the order status does not contain any value it defaultly shows the value like pending.
+
+-- 18. How would you handle situations where a customer's information needs to be updated in both the 'Customers' and 'Orders' tables simultaneously?
+ --Ans: Updating information in the column which is common for both tables , like in the above tables we have customer_numb common if we update customer_numb the information is updated.
+
+--20. In a left join between 'Customers' and 'Orders,' what records are included in the result set?
+ --Ans: when we are performing leftjoin between customer and order all the record in the customers table appears with join of order table, but on order table some values appears as NULL.
+ 
+ --21. Explain the purpose and usage of the SQL GROUP BY clause. Provide an example using the 'Orders' table, demonstrating how it can be used to summarize data.
+ --Ans: The Purpose of the Group by clause in SQL is, it will help to applying the Aggregation functions to the group of rows of the same kind.
+ --Ex: 
+ Select Customer_numb from Orders group by Customer;
+
+ --22. Describe the role of the SQL HAVING clause. How is it different from the WHERE clause, and in what scenarios would you use HAVING?
+ --Ans: Having clause is used for the group by functions, where it helps in defining filters on the grouped query based on the aggregation function.
+ --Where clause is used to filter specific rows based on certain condition while having clause is used to filter group of rows where the query based on conditions involving aggregated values.
+ 
+ --23. In the context of the 'Orders' table, what is a primary key, and why is it important?
+ --Ans:In orders table the primary key is used for order_numb where the primary key does not allows the duplicate values in rows in the table. It has different unique values for each row in the table.
+ 
+ --24. Write an SQL query to find the customer who placed the earliest order based on the 'order_date' in the 'Orders' table.
+  --Ans: Select Order_numb, min(order_date) from orders;
+
+ --25. Explain the concept of indexing in databases. How can it optimize query performance, and when would you consider adding an index to a table
+ --Ans: Indexes helps us to retrieve the data from table quickers. With proper index in place, the database system can then first go through the index to find out where to retrieve the data, and then go to these locations directly to get the needed data
